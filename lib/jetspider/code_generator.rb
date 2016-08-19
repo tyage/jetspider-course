@@ -342,7 +342,12 @@ module JetSpider
     end
 
     def visit_NumberNode(n)
-      @asm.int8 n.value
+      case
+      when n.value == 1
+        @asm.one
+      else
+        @asm.int8 n.value
+      end
     end
 
     def visit_StringNode(n)
