@@ -366,7 +366,8 @@ module JetSpider
     end
 
     def visit_StringNode(n)
-      raise NotImplementedError, 'StringNode'
+      # "hoge" -> hoge にして渡す
+      @asm.string n.value.slice(1..-2)
     end
 
     def visit_ArrayNode(n) raise "ArrayNode not implemented"; end
