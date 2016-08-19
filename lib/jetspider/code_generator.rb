@@ -82,7 +82,11 @@ module JetSpider
     #
 
     def visit_FunctionCallNode(n)
+      # XXX: branch with klass
       case
+      when n.value.is_a?(RKelly::Nodes::DotAccessorNode)
+        visit n.value.value
+        @asm.callprop n.value.accessor
       when n.value.variable.global?
         @asm.callgname n.value.value
       end
@@ -133,14 +137,17 @@ module JetSpider
     end
 
     def visit_OpEqualNode(n)
-      var = n.left.variable
-
       case
-      when var.local?
+      when n.left.is_a?(RKelly::Nodes::DotAccessorNode)
+        visit n.left.value
+        visit n.value
+        @asm.setprop n.left.accessor
+      when n.left.is_a?(RKelly::Nodes::ResolveNode)
+        var = n.left.variable
         visit n.value
         @asm.setlocal var.index
       else
-        raise "[FATAL] unsupported variable type for dereference: #{var.inspect}"
+        raise "[FATAL] unsupported variable type for dereference: #{n.left.inspect}"
       end
     end
 
@@ -161,6 +168,7 @@ module JetSpider
           visit n.value
         end
         @asm.setlocal var.index
+        @asm.pop
       else
         raise "[FATAL] unsupported variable type for dereference: #{var.inspect}"
       end
@@ -359,11 +367,19 @@ module JetSpider
     #
 
     def visit_NewExprNode(n)
-      raise NotImplementedError, 'NewExprNode'
+      visit n.value
+      @asm.push
+
+      args = n.arguments.value
+      args.each do |arg|
+        visit arg
+      end
+      @asm.new args.size
     end
 
     def visit_DotAccessorNode(n)
-      raise NotImplementedError, 'DotAccessorNode'
+      visit n.value
+      @asm.getprop n.accessor
     end
 
     def visit_BracketAccessorNode(n)
