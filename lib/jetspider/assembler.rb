@@ -179,6 +179,18 @@ module JetSpider
     def callprop(name)
       put_insn 'callprop', get_atom_id(name)
     end
+
+    def object(object)
+      put_insn 'object', get_atom_id(object)
+    end
+
+    def arraypush(id)
+      put_insn 'arraypush', ObjectFile.uint16(id)
+    end
+
+    def newarray(id)
+      put_insn 'newarray', ObjectFile.uint24(id)
+    end
   end
 
 end
