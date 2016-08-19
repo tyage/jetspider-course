@@ -1,5 +1,10 @@
 #!/usr/bin/env ruby
 
+require 'pathname'
+ENV['BUNDLE_GEMFILE'] ||= (Pathname(__dir__).parent + 'Gemfile').to_s
+require 'rubygems'
+require 'bundler/setup'
+
 require 'jetspider/disassembler'
 
 jsc_path = ARGV[0]
