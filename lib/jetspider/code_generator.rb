@@ -342,6 +342,14 @@ module JetSpider
 
     def incrementVariable(var)
       case
+      when var.parameter?
+        @asm.getarg var.index
+
+        @asm.getarg var.index
+        @asm.one
+        @asm.add
+        @asm.setarg var.index
+        @asm.pop
       when var.local?
         @asm.getlocal var.index
 
@@ -350,7 +358,7 @@ module JetSpider
         @asm.add
         @asm.setlocal var.index
         @asm.pop
-      else var.global?
+      when var.global?
         @asm.getgname var.name
 
         @asm.bindgname var.name
@@ -359,6 +367,8 @@ module JetSpider
         @asm.add
         @asm.setgname var.name
         @asm.pop
+      else
+        raise "cannot Increment Variable"
       end
     end
 

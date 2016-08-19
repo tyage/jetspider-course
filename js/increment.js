@@ -1,10 +1,14 @@
-function increment() {
-  var a = 2;
+function increment(n) {
+  var a = 3;
   p(a++)
   p(a)
+  p(n++)
+  p(n)
 }
-//increment()
 
 var b = 2;
 p(b++)
 p(b)
+
+increment(10)
+
