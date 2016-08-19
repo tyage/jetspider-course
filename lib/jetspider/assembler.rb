@@ -7,9 +7,15 @@ module JetSpider
     def initialize(object_unit)
       @object_unit = object_unit
       @pc = 0
+
+      @while_block_start_locations = []
+      @while_block_end_locations = []
     end
 
     attr_reader :object_unit
+
+    attr :while_block_start_locations
+    attr :while_block_end_locations
 
     private
 
