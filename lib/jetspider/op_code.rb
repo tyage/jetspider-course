@@ -4,6 +4,7 @@ module JetSpider
   OpCode = Struct.new(:op, :code, :name, :image, :length, :use, :def, :precedance, :formats)
 
 ops = []
+ops.push OpCode.new(* ["JSOP_UNDEFINED", 0, "undefined", nil, 1, 0, 0, 1, ["JOF_BYTE"]])
 ops.push OpCode.new(* ["JSOP_NOP", 0, "nop", nil, 1, 0, 0, 0, ["JOF_BYTE"]])
 ops.push OpCode.new(* ["JSOP_PUSH", 1, "push", nil, 1, 0, 1, 0, ["JOF_BYTE"]])
 ops.push OpCode.new(* ["JSOP_POPV", 2, "popv", nil, 1, 1, 0, 2, ["JOF_BYTE"]])

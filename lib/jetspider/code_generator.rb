@@ -124,7 +124,7 @@ module JetSpider
       when var.parameter?
         @asm.getarg var.index
       when var.local?
-        raise NotImplementedError, 'ResolveNode - local'
+        @asm.getlocal var.index
       when var.global?
         @asm.getgname var.name
       else
@@ -133,19 +133,41 @@ module JetSpider
     end
 
     def visit_OpEqualNode(n)
-      raise NotImplementedError, 'OpEqualNode'
+      var = n.left.variable
+
+      case
+      when var.local?
+        visit n.value
+        @asm.setlocal var.index
+      else
+        raise "[FATAL] unsupported variable type for dereference: #{var.inspect}"
+      end
     end
 
     def visit_VarStatementNode(n)
-      raise NotImplementedError, 'VarStatementNode'
+      n.value.each do |decl|
+        visit decl
+      end
     end
 
     def visit_VarDeclNode(n)
-      raise NotImplementedError, 'VarDeclNode'
+      var = n.variable
+
+      case
+      when var.local?
+        if n.value.nil?
+          @asm.undefined
+        else
+          visit n.value
+        end
+        @asm.setlocal var.index
+      else
+        raise "[FATAL] unsupported variable type for dereference: #{var.inspect}"
+      end
     end
 
     def visit_AssignExprNode(n)
-      raise NotImplementedError, 'AssignExprNode'
+      visit n.value
     end
 
     # We do not support let, const, with
@@ -200,6 +222,7 @@ module JetSpider
       @asm.ifeq end_location
 
       visit n.value
+      @asm.goto start_location
 
       @asm.fix_location end_location
 

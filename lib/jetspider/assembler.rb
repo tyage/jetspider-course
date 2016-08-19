@@ -179,7 +179,6 @@ module JetSpider
     def callprop(name)
       put_insn 'callprop', get_atom_id(name)
     end
-
   end
 
 end
