@@ -83,12 +83,16 @@ module JetSpider
 
     def visit_FunctionCallNode(n)
       # XXX: branch with klass
-      case
-      when n.value.is_a?(RKelly::Nodes::DotAccessorNode)
+      case n.value
+      when RKelly::Nodes::DotAccessorNode
         visit n.value.value
         @asm.callprop n.value.accessor
-      when n.value.variable.global?
-        @asm.callgname n.value.value
+      when RKelly::Nodes::ResolveNode
+        if n.value.variable.global?
+          @asm.callgname n.value.value
+        end
+      else
+        raise SemanticError, "function call with #{n.value.class} not implemented yet"
       end
 
       arguments = n.arguments.value
@@ -168,6 +172,15 @@ module JetSpider
           visit n.value
         end
         @asm.setlocal var.index
+        @asm.pop
+      when var.global?
+        @asm.bindgname var.name
+        if n.value.nil?
+          @asm.undefined
+        else
+          visit n.value
+        end
+        @asm.setgname var.name
         @asm.pop
       else
         raise "[FATAL] unsupported variable type for dereference: #{var.inspect}"
@@ -323,12 +336,28 @@ module JetSpider
       var = n.operand.variable
       case
       when n.value == '++'
+        incrementVariable var
+      end
+    end
+
+    def incrementVariable(var)
+      case
+      when var.local?
         @asm.getlocal var.index
 
         @asm.getlocal var.index
         @asm.one
         @asm.add
         @asm.setlocal var.index
+        @asm.pop
+      else var.global?
+        @asm.getgname var.name
+
+        @asm.bindgname var.name
+        @asm.getgname var.name
+        @asm.one
+        @asm.add
+        @asm.setgname var.name
         @asm.pop
       end
     end

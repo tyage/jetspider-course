@@ -3,4 +3,8 @@ function increment() {
   p(a++)
   p(a)
 }
-increment()
+//increment()
+
+var b = 2;
+p(b++)
+p(b)
