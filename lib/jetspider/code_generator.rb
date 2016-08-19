@@ -230,9 +230,15 @@ module JetSpider
     end
 
     def visit_AddNode(n)
-      visit n.left
-      visit n.value
-      @asm.add
+      # optimize 1 + 2
+      if n.left.is_a? RKelly::Nodes::NumberNode and n.value.is_a? RKelly::Nodes::NumberNode
+        n = RKelly::Nodes::NumberNode.new(n.left.value + n.value.value)
+        visit n
+      else
+        visit n.left
+        visit n.value
+        @asm.add
+      end
     end
 
     def visit_SubtractNode(n)
