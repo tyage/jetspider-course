@@ -1,1 +1,1 @@
-"hogetaro"
+"hogetaro\na"
