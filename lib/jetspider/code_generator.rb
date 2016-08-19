@@ -333,10 +333,43 @@ module JetSpider
     end
 
     def visit_PostfixNode(n)
-      var = n.operand.variable
-      case
-      when n.value == '++'
-        incrementVariable var
+      case n.operand
+      when RKelly::Nodes::DotAccessorNode
+        case
+        when n.value == '++'
+          prop = n.operand.accessor
+
+          # -> recv recv
+          visit n.operand.value
+          @asm.dup
+
+          # -> recv prop
+          @asm.getprop prop
+          # -> recv prop recv prop
+          @asm.dup2
+
+          # -> recv prop newprop
+          @asm.one
+          @asm.add
+          @asm.setprop prop
+
+          # -> prop
+          @asm.pop
+          @asm.swap
+          @asm.pop
+        else
+          raise "not implemented dot accessor node postfix"
+        end
+      when RKelly::Nodes::ResolveNode
+        var = n.operand.variable
+        case
+        when n.value == '++'
+          incrementVariable var
+        else
+          raise "not implemented resolve node postfix"
+        end
+      else
+        raise "cannot resolve postfix node"
       end
     end
 
