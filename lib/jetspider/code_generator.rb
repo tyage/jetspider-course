@@ -207,7 +207,9 @@ module JetSpider
     end
 
     def visit_AddNode(n)
-      raise NotImplementedError, 'AddNode'
+      visit n.left
+      visit n.value
+      @asm.add
     end
 
     def visit_SubtractNode(n)
@@ -317,7 +319,7 @@ module JetSpider
     end
 
     def visit_NumberNode(n)
-      raise NotImplementedError, 'NumberNode'
+      @asm.int8(n.value)
     end
 
     def visit_StringNode(n)
