@@ -258,7 +258,16 @@ module JetSpider
     end
 
     def visit_UnaryMinusNode(n)
-      raise NotImplementedError, 'UnaryMinusNode'
+      value = n.value.value
+
+      case
+      when value < 2 ** 8
+        @asm.int8 -value
+      when value < 2 ** 32
+        @asm.int32 -value
+      else
+        raise NotImplementedError, 'Over 32bit Number'
+      end
     end
 
     def visit_PrefixNode(n)
@@ -342,11 +351,17 @@ module JetSpider
     end
 
     def visit_NumberNode(n)
+      value = n.value
+
       case
-      when n.value == 1
+      when value == 1
         @asm.one
+      when value < 2 ** 8
+        @asm.int8 value
+      when value < 2 ** 32
+        @asm.int32 value
       else
-        @asm.int8 n.value
+        raise NotImplementedError, 'Over 32bit Number'
       end
     end
 
